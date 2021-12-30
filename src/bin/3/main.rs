@@ -1,3 +1,3 @@
 fn main() {
-    println!("Hello world!")
+    println!("{:b}", !0b00000011u8)
 }

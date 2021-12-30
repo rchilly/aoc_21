@@ -1,25 +1,16 @@
-use std::fs::File;
-use std::path::Path;
-use std::io::{self, BufRead};
-
 fn main() {
-    let path = Path::new("data/1.txt");
-
-    let input = match File::open(&path) {
-        Err(why) => panic!("couldn't open {}: {}", path.display(), why),
-        Ok(file) => file,
+    let input = match advent_21::read_input(1) {
+        Err(why) => panic!("failed to read input: {}", why),
+        Ok(v) => v,
     };
-
-    let mut depths: Vec<usize> = Vec::new();
     
-    for line in io::BufReader::new(input).lines() {
-        let string = match line {
-            Err(why) => panic!("couldn't convert line to string: {}", why),
-            Ok(s) => s,
-        };
+    let mut depths: Vec<usize> = Vec::new();
 
-        match string.parse::<usize>() {
-            Err(why) => panic!("couldn't convert string '{}' to number: {}", string, why),
+    // Implicitly calls .into_iter() on the vector, which moves i.e.
+    // consumes it. Any reference to it after here won't compile.
+    for line in input {
+        match line.parse::<usize>() {
+            Err(why) => panic!("couldn't convert line '{}' to number: {}", line, why),
             Ok(number) => depths.push(number),
         }
     }
@@ -29,7 +20,7 @@ fn main() {
     
     let windows = get_rolling_windows(&depths, 3);
     println!("got {} depth windows", windows.len());
-    println!("got {} depth windows greater than the ones before them", count_increasing_numbers(&windows))
+    println!("got {} depth windows greater than the ones before them", count_increasing_numbers(&windows));
 }
 
 // Iterates through numbers, counting each one that's greater than the
@@ -96,24 +87,14 @@ fn get_rolling_windows(numbers: &[usize], window_size: usize) -> Vec<usize> {
         }
 
         for acc in accs.iter_mut() {
-            if acc.count >= window_size {
+            (*acc).count += 1;
+            (*acc).sum += number;
+
+            if acc.count == window_size {
                 windows.push(acc.sum);
                 (*acc).count = 0;
                 (*acc).sum = 0;
             }
-
-            (*acc).count += 1;
-            (*acc).sum += number;
-        }
-    }
-
-    // Same as .iter(). Without the &, would be same as .into_iter().
-    //
-    // Make sure to push the lingering window that was filled by the
-    // last element and so never pushed.
-    for acc in &accs {
-        if acc.count >= window_size {
-            windows.push(acc.sum);
         }
     }
 
