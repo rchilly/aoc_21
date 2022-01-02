@@ -96,7 +96,7 @@ fn main() {
 
     let mut position = Position::default();
     
-    for line in input {
+    for line in input.into_iter() {
         // This calls to (&str).parse() invokes Command's implementation
         // of the FromStr trait under the hood.
         //

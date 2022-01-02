@@ -8,7 +8,7 @@ fn main() {
 
     // Implicitly calls .into_iter() on the vector, which moves i.e.
     // consumes it. Any reference to it after here won't compile.
-    for line in input {
+    for line in input.into_iter() {
         match line.parse::<usize>() {
             Err(why) => panic!("couldn't convert line '{}' to number: {}", line, why),
             Ok(number) => depths.push(number),
