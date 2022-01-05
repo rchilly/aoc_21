@@ -1,14 +1,4 @@
 use std::str::FromStr;
-use std::fmt;
-
-#[derive(Debug)]
-struct CommandParseError(String);
-
-impl fmt::Display for CommandParseError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
 
 #[derive(Debug)]
 enum Direction {
@@ -26,27 +16,27 @@ struct Command {
 impl Command {
     fn transform(&self, p: Position) -> Position {
         match self.dir {
-            Direction::Up => Position{
-                x: p.x, 
-                y: p.y, 
+            Direction::Up => Position {
+                x: p.x,
+                y: p.y,
                 aim: p.aim - self.delta,
             },
-            Direction::Down => Position{
-                x: p.x, 
-                y: p.y, 
-                aim: p.aim + self.delta
+            Direction::Down => Position {
+                x: p.x,
+                y: p.y,
+                aim: p.aim + self.delta,
             },
-            Direction::Forward => Position{
-                x: p.x + self.delta, 
-                y: p.y + self.delta * p.aim, 
-                aim: p.aim
+            Direction::Forward => Position {
+                x: p.x + self.delta,
+                y: p.y + self.delta * p.aim,
+                aim: p.aim,
             },
         }
     }
 }
 
 impl FromStr for Command {
-    type Err = CommandParseError;
+    type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut strs = ("", "");
@@ -55,28 +45,29 @@ impl FromStr for Command {
             match n {
                 0 => strs.0 = s,
                 1 => strs.1 = s,
-                _ => return Err(CommandParseError(format!("too many whitespace delimited substrings"))),
+                _ => return Err("too many whitespace delimited substrings".to_string()),
             }
         }
 
         let dir = strs.0.parse::<Direction>()?;
-        let delta = strs.1.parse::<u32>()
-            .map_err(|_| CommandParseError(String::from("invalid delta")))?;
+        let delta = strs
+            .1
+            .parse::<u32>()
+            .map_err(|_| "invalid delta".to_string())?;
 
-
-        Ok(Command{dir, delta})
+        Ok(Command { dir, delta })
     }
 }
 
 impl FromStr for Direction {
-    type Err = CommandParseError;
+    type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "up" => Ok(Direction::Up),
             "down" => Ok(Direction::Down),
             "forward" => Ok(Direction::Forward),
-            _ => Err(CommandParseError(String::from("invalid direction"))),
+            _ => Err("invalid direction".to_string()),
         }
     }
 }
@@ -95,7 +86,7 @@ fn main() {
     };
 
     let mut position = Position::default();
-    
+
     for line in input.into_iter() {
         // This calls to (&str).parse() invokes Command's implementation
         // of the FromStr trait under the hood.

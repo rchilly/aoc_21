@@ -3,7 +3,7 @@ fn main() {
         Err(why) => panic!("failed to read input: {}", why),
         Ok(v) => v,
     };
-    
+
     let mut depths: Vec<usize> = Vec::new();
 
     // Implicitly calls .into_iter() on the vector, which moves i.e.
@@ -16,11 +16,17 @@ fn main() {
     }
 
     println!("got {} depth measurements from file", depths.len());
-    println!("got {} depth measurements greater than the ones before them", count_increasing_numbers(&depths));
-    
+    println!(
+        "got {} depth measurements greater than the ones before them",
+        count_increasing_numbers(&depths)
+    );
+
     let windows = get_rolling_windows(&depths, 3);
     println!("got {} depth windows", windows.len());
-    println!("got {} depth windows greater than the ones before them", count_increasing_numbers(&windows));
+    println!(
+        "got {} depth windows greater than the ones before them",
+        count_increasing_numbers(&windows)
+    );
 }
 
 // Iterates through numbers, counting each one that's greater than the
@@ -48,7 +54,7 @@ fn count_increasing_numbers(numbers: &[usize]) -> usize {
     };
 
     let mut count: usize = 0;
-    
+
     for number in numbers_iter {
         if number > previous {
             count += 1;
@@ -57,7 +63,7 @@ fn count_increasing_numbers(numbers: &[usize]) -> usize {
         previous = number;
     }
 
-    return count;
+    count
 }
 
 struct Window {
@@ -72,7 +78,7 @@ fn get_rolling_windows(numbers: &[usize], window_size: usize) -> Vec<usize> {
     if length == 0 {
         return vec![];
     }
-    
+
     let mut windows: Vec<usize> = vec![];
     let mut accs: Vec<Window> = Vec::with_capacity(window_size);
 
@@ -102,8 +108,12 @@ fn get_rolling_windows(numbers: &[usize], window_size: usize) -> Vec<usize> {
     println!("  window 1: {}", windows[0]);
     println!("  window 2: {}", windows[1]);
     println!("  ...");
-    println!("  window {}: {}", windows.len()-1, windows[windows.len()-2]);
-    println!("  window {}: {}", windows.len(), windows[windows.len()-1]);
-    
-    return windows;
+    println!(
+        "  window {}: {}",
+        windows.len() - 1,
+        windows[windows.len() - 2]
+    );
+    println!("  window {}: {}", windows.len(), windows[windows.len() - 1]);
+
+    windows
 }
