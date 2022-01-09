@@ -44,7 +44,8 @@ impl School {
         }
 
         self.0.insert(MAX_DAYS, at_zero);
-        self.0.entry(MAX_DAYS - 2)
+        self.0
+            .entry(MAX_DAYS - 2)
             .and_modify(|count| *count += at_zero)
             .or_insert(at_zero);
     }
