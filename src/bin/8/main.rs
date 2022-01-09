@@ -40,38 +40,24 @@ impl SignalGroup {
             zero_to_nine.insert(unique, digit.clone());
         }
 
-        let seven = zero_to_nine.get(SEVEN).unwrap();
-
         let three = digits
             .iter()
-            .find(|d| d.len() == THREE.len() && contains_chars_of(d, seven))
+            .find(|d| {
+                let seven = zero_to_nine.get(SEVEN).unwrap();
+                d.len() == THREE.len() && contains_chars_of(d, seven)
+            })
             .ok_or("three not found")?;
-
-        zero_to_nine.insert(THREE, three.clone());
 
         let nine = digits
             .iter()
-            .find(|d| contains_chars_of(d, three) && d.len() == three.len() + 1)
+            .find(|d| d.len() == NINE.len() && contains_chars_of(d, three))
             .ok_or("nine not found")?;
 
+        zero_to_nine.insert(THREE, three.clone());
         zero_to_nine.insert(NINE, nine.clone());
 
-        let five = digits
-            .iter()
-            .find(|d| {
-                let three = zero_to_nine.get(THREE).unwrap();
-                let nine = zero_to_nine.get(NINE).unwrap();
-                d.len() == FIVE.len() && contains_chars_of(nine, d) && *d != three
-            })
-            .ok_or("five not found")?;
-
-        zero_to_nine.insert(FIVE, five.clone());
-
-        // 1, 3, 4, 5, 7, 8, 9
-
+        // Remove 1, 3, 4, 7, 8, 9, so that only 0, 2, 5 and 6 remain.
         digits.retain(|d| !zero_to_nine.values().any(|v| v == d));
-
-        // At this point, 0, 2 and 6 remain.
 
         let zero = digits
             .iter()
@@ -81,23 +67,28 @@ impl SignalGroup {
             })
             .ok_or("zero not found")?;
 
-        zero_to_nine.insert(ZERO, zero.clone());
-
-        let six = digits
+        let five = digits
             .iter()
             .find(|d| {
-                let five = zero_to_nine.get(FIVE).unwrap();
-                d.len() == SIX.len() && contains_chars_of(d, five)
+                let nine = zero_to_nine.get(NINE).unwrap();
+                d.len() == FIVE.len() && contains_chars_of(nine, d)
             })
-            .ok_or("six not found")?;
+            .ok_or("five not found")?;
 
         let two = digits
             .iter()
-            .find(|d| d.len() == TWO.len())
+            .find(|d| d.len() == TWO.len() && *d != five)
             .ok_or("two not found")?;
 
-        zero_to_nine.insert(SIX, six.clone());
+        let six = digits
+            .iter()
+            .find(|d| d.len() == SIX.len() && contains_chars_of(d, five))
+            .ok_or("six not found")?;
+
+        zero_to_nine.insert(ZERO, zero.clone());
         zero_to_nine.insert(TWO, two.clone());
+        zero_to_nine.insert(FIVE, five.clone());
+        zero_to_nine.insert(SIX, six.clone());
 
         Ok(SignalGroup {
             zero_to_nine,
