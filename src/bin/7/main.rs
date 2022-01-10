@@ -18,10 +18,36 @@ fn main() {
         med_pos
     );
 
+    // True average turns out to be adjacent to the best position.
+    // Trying to represent this less hackily than not rounding to
+    // calculate that average.
+
+    let mut dev = 2;
+    let mut least = usize::MAX;
+    let mut pos = usize::MAX;
+    loop {
+        let mut candidates: Vec<usize> = Vec::with_capacity(dev * 2 + 1);
+        for p in mean_pos - dev..=mean_pos + dev {
+            let c = sum_diffs_to_target(&positions, asc_diff, p);
+            candidates.push(c);
+            if c < least {
+                least = c;
+                pos = p;
+            }
+        }
+
+        // Confirm least as low point of parabola.
+        let len = candidates.len();
+        if least < candidates[0] && least < candidates[len - 1] {
+            break;
+        }
+
+        dev += 1;
+    }
+
     println!(
-        "will cost {} fuel to align at mean position {}",
-        sum_diffs_to_target(&positions, asc_diff, mean_pos),
-        mean_pos
+        "will cost {} fuel to align at mean-ish position {} (mean = {})",
+        least, pos, mean_pos,
     );
 }
 
@@ -45,11 +71,8 @@ fn get_mean(numbers: &[usize]) -> usize {
         sum += number;
     }
 
-    // Rounding mean before returning or skipping the f32
-    // conversion both returned a value 1 greater than correct
-    // answer. So essentially rounding down. Shrug.
     let mean: f32 = sum as f32 / numbers.len() as f32;
-    mean as usize
+    mean.round() as usize
 }
 
 fn sum_diffs_to_target(
@@ -104,7 +127,7 @@ mod tests {
 
     #[test]
     fn get_mean_works() {
-        let numbers = &[16, 1, 2, 0, 4, 2, 7, 1, 2, 15];
+        let numbers = &[16, 1, 2, 0, 4, 2, 7, 1, 2, 14];
         assert_eq!(get_mean(numbers), 5);
     }
 
