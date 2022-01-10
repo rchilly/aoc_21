@@ -104,7 +104,7 @@ mod tests {
 
     #[test]
     fn get_mean_works() {
-        let numbers = &[16, 1, 2, 0, 4, 2, 7, 1, 2, 14];
+        let numbers = &[16, 1, 2, 0, 4, 2, 7, 1, 2, 15];
         assert_eq!(get_mean(numbers), 5);
     }
 
